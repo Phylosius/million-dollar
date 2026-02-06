@@ -253,7 +253,7 @@ export default function SignUp() {
                             size={15}
                             color="red"
                         />
-                        <Text style={styles.inputAlertContainerText}>Password must be at least 4 characters long.</Text>
+                        <Text style={styles.inputAlertContainerText}>Password must be at least 8 characters long.</Text>
                     </View>
                 )}
 
