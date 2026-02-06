@@ -2,7 +2,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import { navigate } from 'expo-router/build/global-state/routing';
 import React, { useState } from "react";
-import { Alert, Image, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 export default function SignUp() {
     const [username, setUsername] = useState("");
@@ -14,6 +14,8 @@ export default function SignUp() {
 
     const [showUsernameAlert, setShowUsernameAlert] = useState(false);
     const [showPasswordAlert, setShowPasswordAlert] = useState(false);
+    const [showConfirmPasswordAlert, setShowConfirmPasswordAlert] = useState(false);
+    const [showSuccessAlert, setShowSuccessAlert] = useState(false);
     // const [mail, setMail] = useState("");
     const [fontsLoaded] = useFonts({
         'MoreSugar': require('@/assets/fonts/MoreSugar-Thin.ttf')
@@ -36,10 +38,10 @@ export default function SignUp() {
                 }, 3000)
             } else {
                 if (password !== confirmPassword) {
-                    setShowPasswordAlert(true);
+                    setShowConfirmPasswordAlert(true);
 
                     setTimeout(() => {
-                        setShowPasswordAlert(false);
+                        setShowConfirmPasswordAlert(false);
                     }, 3000);
                 }
                 else {
@@ -59,15 +61,17 @@ export default function SignUp() {
                         console.log(response);
 
                         if (response.ok) {
-                            console.log("mety");
+                            setShowSuccessAlert(true);
 
-                            Alert.alert("Succès", "Utilisateur créé !");
+                            setTimeout(()=>{
+                                setShowSuccessAlert(false);
+                            }, 3000)
                         } else {
-                            Alert.alert("Erreur", data.message || "Une erreur est survenue");
+                            console.log(data.message);
+                            
                         }
                     } catch (error) {
                         console.log(error);
-                        Alert.alert("Erreur", "Impossible de contacter le serveur");
                     }
                 }
             }
@@ -132,25 +136,13 @@ export default function SignUp() {
             fontFamily: 'MoreSugar',
             width: "90%"
         },
-        usernameAlertContainer: {
+        inputAlertContainer: {
             display: "flex",
             flexDirection: "row",
             alignItems: 'center',
             justifyContent: 'center'
         },
-        usernameAlertText: {
-            color: "red",
-            fontFamily: "MoreSugar",
-            fontSize: 14,
-            marginLeft: 10
-        },
-        passwordAlertContainer: {
-            display: "flex",
-            flexDirection: "row",
-            alignItems: 'center',
-            justifyContent: 'center'
-        },
-        passwordAlertText: {
+        inputAlertContainerText: {
             color: "red",
             fontFamily: "MoreSugar",
             fontSize: 14,
@@ -181,6 +173,22 @@ export default function SignUp() {
             color: color1,
             fontWeight: 'bold',
             fontFamily: 'MoreSugar'
+        },
+        signUpSucces:{
+            backgroundColor: "green",
+            height: 60,
+            width: '45%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: 12,
+            borderRadius: 10,
+            color : "white",
+            fontFamily : "MoreSugar",
+            fontSize : 20,
+            left: "10%",
+            bottom: "5%",
+            position : "absolute"
         }
     });
 
@@ -203,13 +211,13 @@ export default function SignUp() {
                     />
                 </View>
                 {showUsernameAlert && (
-                    <View style={styles.usernameAlertContainer}>
+                    <View style={styles.inputAlertContainer}>
                         <FontAwesome
                             name="info-circle"
                             size={15}
                             color="red"
                         />
-                        <Text style={styles.usernameAlertText}>Username must be at least 4 characters long.</Text>
+                        <Text style={styles.inputAlertContainerText}>Username must be at least 4 characters long.</Text>
                     </View>
                 )}
                 {/* <View style = {styles.inputContainer}>
@@ -239,13 +247,13 @@ export default function SignUp() {
                     </Pressable>
                 </View>
                 {showPasswordAlert && (
-                    <View style={styles.passwordAlertContainer}>
+                    <View style={styles.inputAlertContainer}>
                         <FontAwesome
                             name="info-circle"
                             size={15}
                             color="red"
                         />
-                        <Text style={styles.usernameAlertText}>Password must be at least 4 characters long.</Text>
+                        <Text style={styles.inputAlertContainerText}>Password must be at least 4 characters long.</Text>
                     </View>
                 )}
 
@@ -266,8 +274,16 @@ export default function SignUp() {
                         />
                     </Pressable>
                 </View>
-
-                Password confirmation is incorrect.
+                {showConfirmPasswordAlert && (
+                    <View style={styles.inputAlertContainer}>
+                        <FontAwesome
+                            name="info-circle"
+                            size={15}
+                            color="red"
+                        />
+                        <Text style={styles.inputAlertContainerText}>Password confirmation is incorrect.</Text>
+                    </View>
+                )}
             </View>
             <Pressable style={styles.button} onPress={handleSubmit}>
                 <Text style={styles.buttonText}>
@@ -281,6 +297,9 @@ export default function SignUp() {
                     onPress={() => navigate('/login/signIn')}
                 > Sign in</Text>
             </Text>
+            {showSuccessAlert && (
+                <Text style={styles.signUpSucces}>User created</Text>
+            )}
         </View>
     )
 }
