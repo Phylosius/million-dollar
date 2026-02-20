@@ -3,6 +3,7 @@ import { useFonts } from 'expo-font';
 import { navigate } from 'expo-router/build/global-state/routing';
 import React, { useState } from "react";
 import { Image, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { API_BASE_URL } from '@/constants/api';
 
 
 export default function SignIn() {
@@ -22,7 +23,6 @@ export default function SignIn() {
         'MoreSugar': require('@/assets/fonts/MoreSugar-Thin.ttf')
     });
     const color1 = "#264653";
-    const baseUrl = "http://localhost:8080"
 
     const handleSubmit = async () => {
         if (username.length < 4) {
@@ -33,7 +33,7 @@ export default function SignIn() {
             }, 3000)
         } else {
             try {
-                const response = await fetch(baseUrl + "/auth/sign-in", {
+                const response = await fetch(API_BASE_URL + "/auth/sign-in", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
