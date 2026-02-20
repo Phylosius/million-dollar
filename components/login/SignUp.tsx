@@ -1,76 +1,79 @@
 import { FontAwesome } from '@expo/vector-icons';
+import { useFonts } from 'expo-font';
 import { navigate } from 'expo-router/build/global-state/routing';
 import React, { useState } from "react";
 import { Image, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
-
-export default function SignIp() {
+export default function SignUp() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    // const [mail, setMail] = useState("");
+    const [confirmPassword, setconfirmPassword] = useState("");
 
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const [showUsernameAlert, setShowUsernameAlert] = useState(false);
-    const [showUserNotFoundAlert, setShowUserNotFoundAlert] = useState(false);
     const [showPasswordAlert, setShowPasswordAlert] = useState(false);
-    const [showBadPasswordAlert, setShowBadPasswordAlert] = useState(false);
+    const [showConfirmPasswordAlert, setShowConfirmPasswordAlert] = useState(false);
     const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-
+    // const [mail, setMail] = useState("");
+    const [fontsLoaded] = useFonts({
+        'MoreSugar': require('@/assets/fonts/MoreSugar-Thin.ttf')
+    });
     const color1 = "#264653";
-    const baseUrl = "http://localhost:8080"
-
+    const urlBase = "http://localhost:8080"
     const handleSubmit = async () => {
         if (username.length < 4) {
             setShowUsernameAlert(true);
 
             setTimeout(() => {
-                setShowUsernameAlert(false);
+                setShowUsernameAlert(false)
             }, 3000)
         } else {
-            try {
-                const response = await fetch(baseUrl + "/auth/sign-in", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        username: username,
-                        password: password
-                    }),
-                });
-
-                const data = await response.json();
-                console.log(data);
-
-                if (response.ok) {
-                    setShowSuccessAlert(true);
-
-                    setTimeout(() => {
-                        setShowSuccessAlert(false);
-                    }, 3000)
-                } if (data.code === 404) {
-                    setShowUserNotFoundAlert(true);
-
-                    setTimeout(() => {
-                        setShowUserNotFoundAlert(false);
-                    }, 3000)
-                } if (data.message === "Bad password") {
-                    setShowBadPasswordAlert(true);
-
-                    setTimeout(() => {
-                        setShowBadPasswordAlert(false);
-                    }, 3000)
-                }
-            } catch (error) {
-                console.log(error);
-            }
             if (password.length < 8) {
                 setShowPasswordAlert(true);
 
                 setTimeout(() => {
-                    setShowPasswordAlert(false)
+                    setShowPasswordAlert(false);
                 }, 3000)
+            } else {
+                if (password !== confirmPassword) {
+                    setShowConfirmPasswordAlert(true);
+
+                    setTimeout(() => {
+                        setShowConfirmPasswordAlert(false);
+                    }, 3000);
+                }
+                else {
+                    try {
+                        const response = await fetch(urlBase + "/auth/sign-up", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                username: username,
+                                password: password
+                            }),
+                        });
+
+                        const data = await response.json();
+                        console.log(response);
+
+                        if (response.ok) {
+                            setShowSuccessAlert(true);
+
+                            setTimeout(() => {
+                                setShowSuccessAlert(false);
+                            }, 3000)
+                        } else {
+                            console.log(data.message);
+
+                        }
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }
             }
         }
     }
@@ -118,7 +121,7 @@ export default function SignIp() {
             paddingLeft: 10,
             borderRadius: 10,
             borderWidth: 2,
-            marginTop: 25
+            marginTop: 20
         },
         text: {
             fontSize: 20,
@@ -126,12 +129,12 @@ export default function SignIp() {
             fontFamily: 'MoreSugar'
         },
         textInput: {
-            borderWidth: 0,
-            borderColor: 'red',
+            borderWidth: 2,
+            borderColor: 'white',
             padding: 10,
             fontSize: 16,
-            width: '90%',
-            fontFamily: 'MoreSugar'
+            fontFamily: 'MoreSugar',
+            width: "90%"
         },
         inputAlertContainer: {
             display: "flex",
@@ -146,22 +149,20 @@ export default function SignIp() {
             marginLeft: 10
         },
         button: {
-            color: "white",
-            backgroundColor: "#264653",
+            backgroundColor: color1,
             height: 60,
             width: '80%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 25,
-            marginTop: 25,
-            borderRadius: 10,
-            fontFamily: 'MoreSugar'
+            marginTop: 12,
+            borderRadius: 10
         },
         buttonText: {
             fontFamily: 'MoreSugar',
             color: "white",
             fontSize: 25
+
         },
         signIn: {
             marginTop: 15,
@@ -173,7 +174,7 @@ export default function SignIp() {
             fontWeight: 'bold',
             fontFamily: 'MoreSugar'
         },
-        signInSucces: {
+        signUpSucces: {
             backgroundColor: "green",
             height: 60,
             width: '45%',
@@ -190,9 +191,9 @@ export default function SignIp() {
             position: "absolute"
         }
     });
+
     return (
-        <View style={styles.container}
-        >
+        <View style={styles.container}>
             <Image
                 style={styles.logo}
                 source={require('@/assets/images/LogoPF.png')}
@@ -217,16 +218,6 @@ export default function SignIp() {
                             color="red"
                         />
                         <Text style={styles.inputAlertContainerText}>Username must be at least 4 characters long.</Text>
-                    </View>
-                )}
-                {showUserNotFoundAlert && (
-                    <View style={styles.inputAlertContainer}>
-                        <FontAwesome
-                            name="info-circle"
-                            size={15}
-                            color="red"
-                        />
-                        <Text style={styles.inputAlertContainerText}>User not found.</Text>
                     </View>
                 )}
                 {/* <View style = {styles.inputContainer}>
@@ -265,14 +256,32 @@ export default function SignIp() {
                         <Text style={styles.inputAlertContainerText}>Password must be at least 8 characters long.</Text>
                     </View>
                 )}
-                {showBadPasswordAlert && (
+
+                <View style={styles.inputContainer}>
+                    <FontAwesome name="lock" size={24} color={color1} />
+                    <TextInput
+                        style={styles.textInput}
+                        placeholder="Confirm Password"
+                        value={confirmPassword}
+                        onChangeText={setconfirmPassword}
+                        secureTextEntry={!showConfirmPassword}
+                    />
+                    <Pressable onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                        <FontAwesome
+                            name={showConfirmPassword ? 'eye-slash' : 'eye'}
+                            size={24}
+                            color={color1}
+                        />
+                    </Pressable>
+                </View>
+                {showConfirmPasswordAlert && (
                     <View style={styles.inputAlertContainer}>
                         <FontAwesome
                             name="info-circle"
                             size={15}
                             color="red"
                         />
-                        <Text style={styles.inputAlertContainerText}>Your password is wrong.</Text>
+                        <Text style={styles.inputAlertContainerText}>Password confirmation is incorrect.</Text>
                     </View>
                 )}
             </View>
@@ -281,16 +290,15 @@ export default function SignIp() {
                     Sign Up
                 </Text>
             </Pressable>
-            <Text
-                style={styles.signIn}
-            >New User ?
+            <Text style={styles.signIn}>
+                Already have an account ?
                 <Text
                     style={styles.signInText}
-                    onPress={() => navigate('/login/signUp')}
-                > Register Now</Text>
+                    onPress={() => navigate('/login/signIn')}
+                > Sign in</Text>
             </Text>
             {showSuccessAlert && (
-                <Text style={styles.signInSucces}>Sign In successfull</Text>
+                <Text style={styles.signUpSucces}>User created</Text>
             )}
         </View>
     )
